@@ -1,5 +1,14 @@
-#login_area{
+.login_space{
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+}
+
+#login_prompt{
+    text-align: center;
+    display: none;
+}
+
+#logout_form{
+	display: none;
 }
