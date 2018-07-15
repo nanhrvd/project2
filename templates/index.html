@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='mystyle.css')}}">
+    <script src="{{ url_for('static', filename='index.js')}}"></script>
+    <title>Chatter</title>
+</head>
+
+<body>
+    <div class="col-lg-12">
+
+        <div class="row header" style="background-color:silver">
+            <div class="col-4">
+                <form class="form-inline mt-2 mb-2">
+                    <div class="form-group mx-sm-3">
+                        <label for="new_server_form" class="sr-only">Make new chat server:</label>
+                        <input type="text" class="form-control logged_in" id="new_server_input" placeholder="Server Name">
+                    </div>
+                    <button type="submit" class="btn btn-primary logged_in" id="new_server_button">Create Server</button>
+                </form>
+            </div>
+            <div class="col-4">
+            </div>
+            <div class="col-4 justify-content-end" id="login_area">
+                <form class="form-inline mt-2 mb-2">
+                    <div class="form-group mx-sm-3">
+                        <label for="new_server_form" class="sr-only">Set Username:</label>
+                        <input type="text" class="form-control" id="new_server_input" placeholder="Username">
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="new_server_button">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+  <div class="col-2">
+    <div class="list-group mx-sm-3 mt-sm-3" id="list-tab" role="tablist">
+      <a class="btn list-group-item list-group-item-action logged_in disabled" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Home</a>
+      <a class="btn list-group-item list-group-item-action logged_in" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
+      <a class="btn list-group-item list-group-item-action logged_in" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
+      <a class="btn list-group-item list-group-item-action logged_in" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+    </div>
+  </div>
+  <div class="col-10">
+    <div class="tab-content mx-sm-3 mt-sm-3" id="nav-tabContent">
+      <div class="tab-pane fade" id="list-home" role="tabpanel" aria-labelledby="list-home-list">Hello am i home?</div>
+      <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">...</div>
+      <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
+      <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
