@@ -1,3 +1,18 @@
+document.addEventListener('DOMContentLoaded', () => {
+    var_init();
+    form_init();
+    button_init();
+    console.log('init');
+
+    // check login status
+    console.log("username is " + localStorage.getItem('username'));
+    if (localStorage.getItem('username') === '') {
+        logged_out(true);
+    } else {
+        logged_out(false);
+    }
+});
+
 // initializes variables and binds forms
 function var_init() {
     localStorage.removeItem("username");
@@ -24,20 +39,61 @@ function button_init() {
     document.querySelector("#logout_button").disabled = false;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    var_init();
-    form_init();
-    button_init();
-    console.log('init');
+function socketio_init() {
+    // Connect to websocket
+    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-    // check login status
-    console.log("username is " + localStorage.getItem('username'));
-    if (localStorage.getItem('username') === '') {
-        logged_out(true);
-    } else {
-        logged_out(false);
-    }
-});
+    // When connected, configure buttons
+    socket.on('connect', () => {
+
+        // Server creation button should add a new button
+        document.querySelector('button').forEach(button => {
+            button.onclick = () => {
+                var server_name = document.querySelector("#new_server_input").value;
+                document.querySelector("#new_server_input").value = '';
+                socket.emit('add_server', {'name': server_name});
+            };
+        });
+    });
+
+    // When a new server is announced, refresh the list
+    socket.on('refresh_serverList', data => {
+        var channels;
+        var server_list = document.getElementById('server_list');
+        // server_list.innerHTML = "";
+
+        var message_area = document.getElementById('chat_logs');
+
+        for(var i = 0; i < data.length; i++) {
+            var server_id = "#" + data[i] + "-server"
+            var tab_id = "#" + data[i] + "-messages";
+            new_channel = document.createElement("a");
+            new_channel.setAttribute("class", "btn list-group-item list-group-item-action logged_in");
+            new_channel.setAttribute("role", "tab");
+            new_channel.setAttribute("href", "tab_id");
+            new_channel.setAttribute("data-toggle", "list");
+            new_channel.setAttribute("aria-controls", data[i]);
+            new_channel.setAttribute("id", server_id);
+            new_channel.innerHTML = data[i];
+
+            var new_messages = document.createElement("div");
+            new_messages.setAttribute("class", "tab-pane fade");
+            new_messages.setAttribute("role", "tabpanel");
+            new_messages.setAttribute("id", tab_id);
+            new_messages.setAttribute("aria-labelledby", server_id);
+            new_messages.innerHTML = "TEMPORARY VAL";
+
+
+            server_list.append(new_channel);
+            message_area.append(new_messages);
+
+        }
+    });
+
+    socket.on('refresh_chatList', data => {
+
+    });
+}
 
 function logged_out(loggedOut) {
     console.log("logging out");
