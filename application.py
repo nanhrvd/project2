@@ -10,17 +10,21 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
 # list of all channels
-channel_list = set('general')
+channel_list = set(['general'])
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
 @socketio.on("add_server")
-def vote(data):
+def add_server(data):
     name = data["name"]
-    if name in set:
+    print("name is: " + name);
+    print("channel list contains:");
+    for i in channel_list:
+    	print(i);
+    if name in channel_list:
     	return;
     else:
 	    channel_list.add(name)
-	    emit("refresh_serverList", channel_list, broadcast=True)
+	    emit("refresh_serverList", list(channel_list), broadcast=True)

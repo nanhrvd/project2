@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     var_init();
     form_init();
     button_init();
+    socketio_init();
     console.log('init');
 
     // check login status
@@ -45,19 +46,22 @@ function socketio_init() {
 
     // When connected, configure buttons
     socket.on('connect', () => {
-
+        console.log("CNXN EST to socket io");
         // Server creation button should add a new button
-        document.querySelector('button').forEach(button => {
-            button.onclick = () => {
-                var server_name = document.querySelector("#new_server_input").value;
-                document.querySelector("#new_server_input").value = '';
-                socket.emit('add_server', {'name': server_name});
-            };
-        });
+        document.getElementById("new_server_form").onsubmit = () => { 
+            console.log("SUBMITTED new server form");           
+            var server_name = document.querySelector("#new_server_input").value;
+            document.querySelector("#new_server_input").value = '';
+            console.log("about to emit ADD_SERVER");
+            socket.emit('add_server', {'name': server_name});
+            console.log("RETURNING FALSE");
+            return false;
+        };
     });
 
     // When a new server is announced, refresh the list
     socket.on('refresh_serverList', data => {
+        console.log("REFRESH SERVERLIST CALLED");
         var channels;
         var server_list = document.getElementById('server_list');
         // server_list.innerHTML = "";
@@ -144,6 +148,7 @@ function setup_login() {
 // Setup logout submission handler
 function setup_logout() {
     document.querySelector('#logout_request').onsubmit = () => {
+        console.log("log out button clicked");
         localStorage.removeItem('username');
         logged_out(true);
         return false;
