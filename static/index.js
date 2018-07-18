@@ -1,25 +1,32 @@
+var socket;
+
 document.addEventListener('DOMContentLoaded', () => {
+    socketio_init();
     var_init();
     form_init();
     button_init();
-    socketio_init();
     console.log('init');
 
+    // get servers
+    socket.emit('add_server', {'name': null});
+
     // check login status
-    console.log("username is " + localStorage.getItem('username'));
+    console.log("js username is " + localStorage.getItem('username'));
     if (localStorage.getItem('username') === '') {
         logged_out(true);
     } else {
         logged_out(false);
     }
+
 });
 
-// initializes variables and binds forms
+// initialization functions
 function var_init() {
-    localStorage.removeItem("username");
-
-    if (!localStorage.getItem('username'))
-        localStorage.setItem('username', '');
+    console.log("VAR INIT")
+    if (localStorage.getItem("username") === null)
+        localStorage.setItem("username", "");
+    if (localStorage.getItem("last_viewed") === null)
+        localStorage.setItem("last_viewed", "");
 }
 
 function form_init() {
@@ -41,9 +48,7 @@ function button_init() {
 }
 
 function socketio_init() {
-    // Connect to websocket
-    var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-
+    socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
     // When connected, configure buttons
     socket.on('connect', () => {
         console.log("CNXN EST to socket io");
@@ -64,34 +69,71 @@ function socketio_init() {
         console.log("REFRESH SERVERLIST CALLED");
         var channels;
         var server_list = document.getElementById('server_list');
-        // server_list.innerHTML = "";
-
         var message_area = document.getElementById('chat_logs');
 
-        for(var i = 0; i < data.length; i++) {
-            var server_id = "#" + data[i] + "-server"
-            var tab_id = "#" + data[i] + "-messages";
-            new_channel = document.createElement("a");
-            new_channel.setAttribute("class", "btn list-group-item list-group-item-action logged_in");
-            new_channel.setAttribute("role", "tab");
-            new_channel.setAttribute("href", "tab_id");
-            new_channel.setAttribute("data-toggle", "list");
-            new_channel.setAttribute("aria-controls", data[i]);
-            new_channel.setAttribute("id", server_id);
-            new_channel.innerHTML = data[i];
-
-            var new_messages = document.createElement("div");
-            new_messages.setAttribute("class", "tab-pane fade");
-            new_messages.setAttribute("role", "tabpanel");
-            new_messages.setAttribute("id", tab_id);
-            new_messages.setAttribute("aria-labelledby", server_id);
-            new_messages.innerHTML = "TEMPORARY VAL";
-
-
-            server_list.append(new_channel);
-            message_area.append(new_messages);
-
+        // parse data
+        var parsed_data = [];
+        for (var i = 0; i < data.length; i++) {
+            var safe_server = data[i].replace("-", "--").replace(" ", "-");
+            var serverID = safe_server + "-server";
+            var messageID = safe_server + "-messages";
+            var parse = {server_id:serverID, message_id:messageID, server:safe_server, server_name:data[i]};
+            parsed_data.push(parse);
         }
+
+        // generate server list
+        var temp_class = "btn list-group-item list-group-item-action logged_in";
+        if (localStorage.getItem('username') === '')
+            temp_class += " disabled";
+        var html_temp = "<a class=\"" + temp_class + 
+                            "\" role=\"tab\"" +
+                            "href=\"#{{ message_id }}" + 
+                            "\" data-toggle=\"list\" aria-controls=\"{{ server }}\"" +
+                            "id=\"{{ server_id }}\" aria-selected=\"false\">{{ server_name }}</a>"
+        var server_master_temp = "{{#each this }} " + html_temp + " {{/each}}"
+
+        const server_template = Handlebars.compile(server_master_temp);
+        const server_content = server_template(parsed_data);
+
+        // generate message list
+        html_temp = "<div class=\"tab-pane fade\" id=\"{{ message_id }}\"" + 
+                    "role=\"tabpanel\" aria-labelledby=\"{{ server_id }}\">" +
+                    "{{ message_id }}, parent is {{ server_id }}</div>"
+        var message_master_temp = "{{#each this }} " + html_temp + " {{/each}}"
+        const message_template = Handlebars.compile(message_master_temp);
+        const message_content = message_template(parsed_data);
+
+
+        // insert content
+        server_list.innerHTML = server_content;
+        message_area.innerHTML = message_content;
+
+
+        // for(var i = 0; i < data.length; i++) {
+        //     var server_id = data[i] + "-server"
+        //     var tab_id = data[i] + "-messages";
+        //     var tab_id2 = "#" + tab_id;
+        //     new_channel = document.createElement("a");
+        //     new_channel.setAttribute("class", "btn list-group-item list-group-item-action logged_in");
+        //     new_channel.setAttribute("role", "tab");
+        //     new_channel.setAttribute("href", tab_id2);
+        //     new_channel.setAttribute("data-toggle", "list");
+        //     new_channel.setAttribute("aria-controls", data[i]);
+        //     new_channel.setAttribute("id", server_id);
+        //     new_channel.innerHTML = data[i];
+
+        //     var new_messages = document.createElement("div");
+        //     new_messages.setAttribute("class", "tab-pane fade");
+        //     new_messages.setAttribute("role", "tabpanel");
+        //     new_messages.setAttribute("id", tab_id);
+        //     new_messages.setAttribute("aria-labelledby", server_id);
+        //     new_messages.innerHTML = tab_id;
+
+
+        //     server_list.append(new_channel);
+        //     message_area.append(new_messages);
+
+        // }
     });
 
     socket.on('refresh_chatList', data => {
@@ -128,7 +170,10 @@ function logged_out(loggedOut) {
         // turn off login form and turn on logout
         var message = "Hello " + localStorage.getItem('username');
         document.getElementById('logout_message').placeholder = message;
-        display_login(false);        
+        display_login(false); 
+        // render servers
+        socket.emit('add_server', {'name': null});
+
     }
 
 }
@@ -159,10 +204,12 @@ function display_login(to_display) {
         document.querySelector("#login_prompt").style.display = "block";
         document.querySelector("#login_form").style.display = "block";
         document.querySelector("#logout_form").style.display = "none";
+        document.querySelector("#chat_logs").style.display = "none";
     } else {
         document.querySelector("#login_prompt").style.display = "none";
         document.querySelector("#login_form").style.display = "none";
         document.querySelector("#logout_form").style.display = "block";
+        document.querySelector("#chat_logs").style.display = "block";
     }
 } 
 
