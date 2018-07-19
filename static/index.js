@@ -36,10 +36,12 @@ function form_init() {
 
 function button_init() {
     // disable all input buttons pending validation
-    var buttons = document.querySelectorAll('[type=submit]');
-    for (var i = 0; i < buttons.length; i++) {
-        buttons[i].disabled = true;
-    }
+    var buttons = document.querySelectorAll('[type=submit]').forEach(function(button) {
+        button.disabled = true;
+    });
+    // for (var i = 0; i < buttons.length; i++) {
+    //     buttons[i].disabled = true;
+    // }
     setup_validation("#username_input", "#username_button");
     setup_validation("#new_server_input", "#new_server_button");
 
@@ -57,6 +59,8 @@ function socketio_init() {
             console.log("SUBMITTED new server form");           
             var server_name = document.querySelector("#new_server_input").value;
             document.querySelector("#new_server_input").value = '';
+            var server_id = server_name.replace("-", "--").replace(" ", "-") + "-server";
+            localStorage.setItem("current_server", server_id);
             console.log("about to emit ADD_SERVER");
             socket.emit('add_server', {'name': server_name});
             console.log("RETURNING FALSE");
@@ -73,16 +77,23 @@ function socketio_init() {
 
         // parse data
         var parsed_data = [];
-        for (var i = 0; i < data.length; i++) {
-            var safe_server = data[i].replace("-", "--").replace(" ", "-");
+        for (let parse of data) {
+            var safe_server = parse.replace("-", "--").replace(" ", "-");
             var serverID = safe_server + "-server";
             var messageID = safe_server + "-messages";
-            var parse = {server_id:serverID, message_id:messageID, server:safe_server, server_name:data[i]};
-            parsed_data.push(parse);
+            var parsed = {server_id:serverID, message_id:messageID, server:safe_server, server_name:parse};
+            parsed_data.push(parsed);
         }
+        // for (var i = 0; i < data.length; i++) {
+        //     var safe_server = data[i].replace("-", "--").replace(" ", "-");
+        //     var serverID = safe_server + "-server";
+        //     var messageID = safe_server + "-messages";
+        //     var parse = {server_id:serverID, message_id:messageID, server:safe_server, server_name:data[i]};
+        //     parsed_data.push(parse);
+        // }
 
         // generate server list
-        var temp_class = "btn list-group-item list-group-item-action logged_in";
+        var temp_class = "btn list-group-item list-group-item-action logged_in servers";
         if (localStorage.getItem('username') === '')
             temp_class += " disabled";
         var html_temp = "<a class=\"" + temp_class + 
@@ -107,38 +118,48 @@ function socketio_init() {
         // insert content
         server_list.innerHTML = server_content;
         message_area.innerHTML = message_content;
+        bind_server_buttons();
 
+        // check for last active server button and message
+        if (localStorage.getItem("current_server") != null) {
+            var current = document.getElementById(localStorage.getItem("current_server"));
+            if (current == null) {
+                localStorage.removeItem("current_server");
+                return false;
+            }
+            current.classList.add("active");
+            current.classList.add("show");
+            current.setAttribute("aria-selected", "true");
 
-        // for(var i = 0; i < data.length; i++) {
-        //     var server_id = data[i] + "-server"
-        //     var tab_id = data[i] + "-messages";
-        //     var tab_id2 = "#" + tab_id;
-        //     new_channel = document.createElement("a");
-        //     new_channel.setAttribute("class", "btn list-group-item list-group-item-action logged_in");
-        //     new_channel.setAttribute("role", "tab");
-        //     new_channel.setAttribute("href", tab_id2);
-        //     new_channel.setAttribute("data-toggle", "list");
-        //     new_channel.setAttribute("aria-controls", data[i]);
-        //     new_channel.setAttribute("id", server_id);
-        //     new_channel.innerHTML = data[i];
-
-        //     var new_messages = document.createElement("div");
-        //     new_messages.setAttribute("class", "tab-pane fade");
-        //     new_messages.setAttribute("role", "tabpanel");
-        //     new_messages.setAttribute("id", tab_id);
-        //     new_messages.setAttribute("aria-labelledby", server_id);
-        //     new_messages.innerHTML = tab_id;
-
-
-        //     server_list.append(new_channel);
-        //     message_area.append(new_messages);
-
-        // }
+            var messages_id = localStorage.getItem("current_server");
+            var message = document.getElementById(messages_id.slice(0, -6) + "messages");
+            console.log("getting message tab " + messages_id);
+            message.classList.add("active");
+            message.classList.add("show");
+        }
     });
 
     socket.on('refresh_chatList', data => {
 
     });
+}
+
+function bind_server_buttons() {
+    var server_buttons = document.querySelectorAll(".servers");
+    for (let button of server_buttons) {
+        console.log(button);
+        button.onclick = () => {
+            console.log("SAVED CURRENT SERVER " + button.id);
+            localStorage.setItem("current_server", button.id);
+        };
+    }
+    // for (var i = 0; i < server_buttons.length; i++) {
+    //     console.log(server_buttons[i]);
+    //         this.onclick() = () => {
+    //         console.log("SAVED CURRENT SERVER " + server_buttons[i].id);
+    //         localStorage.setItem("current_server", server_buttons[i].id);
+    //     };
+    // }
 }
 
 function logged_out(loggedOut) {
@@ -148,11 +169,16 @@ function logged_out(loggedOut) {
     console.log("passed int " + loggedOut);
     if (loggedOut){
         // turn off areas that require login
-        for (var i = 0; i < to_modify.length; i++) {
+        for (let areas of to_modify) {
             console.log("disabled");
-            to_modify[i].classList.add("disabled");
-            to_modify[i].disabled = true;
+            areas.classList.add("disabled");
+            areas.disabled = true;
         }
+        // for (var i = 0; i < to_modify.length; i++) {
+        //     console.log("disabled");
+        //     this.classList.add("disabled");
+        //     this.disabled = true;
+        // }
         // reset login value and turn on login form
         document.querySelector("#username_input").value = '';
 
@@ -163,19 +189,21 @@ function logged_out(loggedOut) {
         display_login(true);
     } else {
         // turn on areas requiring login
-        for (i = 0; i < to_modify.length; i++) {
-            to_modify[i].classList.remove("disabled");
-            to_modify[i].disabled=false;
+        for (let areas of to_modify) {
+            areas.classList.remove("disabled");
+            areas.disabled = false;
         }
+        // for (i = 0; i < to_modify.length; i++) {
+        //     this.classList.remove("disabled");
+        //     this.disabled=false;
+        // }
         // turn off login form and turn on logout
         var message = "Hello " + localStorage.getItem('username');
         document.getElementById('logout_message').placeholder = message;
         display_login(false); 
         // render servers
         socket.emit('add_server', {'name': null});
-
     }
-
 }
 
 // Setup login submission handler
@@ -195,6 +223,7 @@ function setup_logout() {
     document.querySelector('#logout_request').onsubmit = () => {
         console.log("log out button clicked");
         localStorage.removeItem('username');
+        localStorage.removeItem('current_server');
         logged_out(true);
         return false;
     };

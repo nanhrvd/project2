@@ -12,3 +12,8 @@
 #logout_form{
     display: none;
 }
+
+.tab-pane{
+    height:67%;
+    overflow-y:scroll;
+}
