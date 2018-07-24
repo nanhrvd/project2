@@ -14,9 +14,8 @@
 </head>
 
 <body>
-    <div class="col-lg-12">
-
-        <div class="row header" style="background-color:silver">
+    <div class="col-lg-12 header_area">
+        <div class="row header">
             <div class="col-6">
                 <form id="new_server_form" class="form-inline mt-2 mb-2" autocomplete="off">
                     <div class="form-group mx-sm-3">
@@ -26,51 +25,47 @@
                     <button type="submit" class="btn btn-primary" id="new_server_button">Create Server</button>
                 </form>
             </div>
-    <!--         <div class="col-4">
-            </div> -->
             <div class="col-6 justify-content-end login_space" id="login_area">
-              <div id="login_form">
-                <form id="new_username" class="form-inline mt-2 mb-2" autocomplete="off">
-                    <div class="form-group mx-sm-3">
-                        <label for="username_input" class="sr-only">Set Username:</label>
-                        <input type="text" class="form-control" id="username_input" placeholder="Username">
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="username_button">Login</button>
-                </form>
-              </div>
+                <div id="login_form">
+                    <form id="new_username" class="form-inline mt-2 mb-2" autocomplete="off">
+                        <div class="form-group mx-sm-3">
+                            <label for="username_input" class="sr-only">Set Username:</label>
+                            <input type="text" class="form-control" id="username_input" placeholder="Username">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="username_button">Login</button>
+                    </form>
+                </div>
 
-              <div id="logout_form">
-                <form id="logout_request" class="form-inline mt-2 mb-2">
-                    <div class="form-group mx-sm-3">
-                      <input class="form-control" id="logout_message" type="text" placeholder="" readonly>
-                    </div>
-                    <button type="submit" class="btn btn-primary" id="logout_button">Logout!</button>
-                </form>
-              </div>
+                <div id="logout_form">
+                    <form id="logout_request" class="form-inline mt-2 mb-2">
+                        <div class="form-group mx-sm-3">
+                          <input class="form-control" id="logout_message" type="text" placeholder="" readonly>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="logout_button">Logout!</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    <div class="row">
-  <div class="col-2">
-    <div class="list-group mx-sm-3 mt-sm-3" role="tablist" id="server_list">
-      <a class="btn list-group-item list-group-item-action logged_in" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">Home</a>
-      <a class="btn list-group-item list-group-item-action logged_in" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
-      <a class="btn list-group-item list-group-item-action logged_in" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">Messages</a>
-      <a class="btn list-group-item list-group-item-action logged_in" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">Settings</a>
+    <div class="row message_area">
+        <div class="col-3">
+            <div class="list-group mx-sm-3 mt-sm-3" role="tablist" id="server_list">
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="tab-pane mt-sm-3">
+                <h1 class="mx-sm-3" id="login_prompt">Please Login</h1>
+                <div class="tab-content mx-sm-3 mt-sm-3" id="chat_logs">
+                </div>
+            </div>
+            <form class="mx-sm-3" id="new_message_form" autocomplete="off">
+                <div class="form-group">
+                    <label for="message_input">Type Message:</label>
+                    <textarea class="form-control logged_in" id="message_input" rows="2"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2" id="message_post">Post Message</button>
+            </form>
+        </div>
     </div>
-  </div>
-  <div class="col-10">
-    <h1 class="mx-sm-3 mt-sm-3" id="login_prompt">Please Login</h1>
-    <div class="tab-pane">
-      <div class="tab-content mx-sm-3 mt-sm-3" id="chat_logs">
-        <div class="tab-pane fade" id="list-home" role="tabpanel" aria-labelledby="list-home-list">Hello am i home?</div>
-        <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile">is my profile messed up</div>
-        <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">...</div>
-        <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>
-      </div>
-    </div>
-    <p>Hi i'm a new paragraph</p>
-  </div>
-</div>
 </body>
 </html>

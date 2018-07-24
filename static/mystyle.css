@@ -1,19 +1,44 @@
-.login_space{
+html, body {
+  height: 100%; 
+}
+
+.login_space {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
 }
 
-#login_prompt{
+#login_prompt {
     text-align: center;
     display: none;
 }
 
-#logout_form{
+#logout_form {
     display: none;
 }
 
-.tab-pane{
-    height:67%;
+.tab-pane {
+    height:100%;
     overflow-y:scroll;
+}
+
+.message_area {
+	height:70%;
+}
+
+.header_area {
+	background-color:silver
+}
+
+#server_list {
+	height:100%;
+	overflow-y:scroll;
+}
+
+.servers {
+	width:80%;
+}
+
+#message_input {
+	width:90%;
 }
