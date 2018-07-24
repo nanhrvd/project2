@@ -3,4 +3,4 @@ Flask-SocketIO
 Flask-Session
 gevent
 gevent-websocket
-pytz
+pytz tzlocal
