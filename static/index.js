@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // check login status
     if (localStorage.getItem('username') === '') {
+        load_current();
         logged_out(true);
     } else {
         logged_out(false);
@@ -23,8 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function var_init() {
     if (localStorage.getItem("username") === null)
         localStorage.setItem("username", "");
-    if (localStorage.getItem("last_viewed") === null)
-        localStorage.setItem("last_viewed", "");
     // update tracking starts when you log in
     counters = {"general-server":0};
 }
@@ -52,12 +51,13 @@ function socketio_init() {
     // setup socket connect
     socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 
-    // setup new server form
     socket.on('connect', () => {
+        // setup new server form
         document.getElementById("new_server_form").onsubmit = () => { 
             var server_name = document.querySelector("#new_server_input").value;
             // reset form
             document.querySelector("#new_server_input").value = '';
+            document.querySelector("#new_server_button").disabled = true;
 
             // parse input as html id, check if is current
             var server_id = server_name.replace("-", "--").replace(" ", "-") + "-server";
@@ -67,7 +67,7 @@ function socketio_init() {
 
             // update current server if doesn't exist and emit add server
             localStorage.setItem("current_server", server_id);
-            if(document.getElementById(server_id) == null) {
+            if (document.getElementById(server_id) == null) {
                 socket.emit('add_server', {'id': server_id, 'name':server_name});
             } else {
                 load_current();
@@ -301,7 +301,8 @@ function logged_out(loggedOut) {
         document.getElementById('logout_message').placeholder = message;
         display_login(false); 
         // render servers
-        localStorage.setItem('current_server', "general-server");
+        if (localStorage.getItem('current_server') == null)
+            localStorage.setItem('current_server', "general-server");
         socket.emit('add_server', {'name': null, "id":null});
     }
 }
